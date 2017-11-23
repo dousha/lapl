@@ -3,6 +3,7 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import java.io.File
 import java.nio.charset.Charset
+import kotlin.system.exitProcess
 
 class Parser {
 	private fun scan(file: File): Boolean {
@@ -25,6 +26,7 @@ class Parser {
 			println("!> Syntax error: brackets mismatch!\n")
 			return
 		}
+		println("|> Parsing...")
 		file.readLines(Charset.forName("UTF-8")).filter { !it.trim().startsWith('#') }.forEach {
 			var i = 0
 			val line = it.trim()
@@ -59,11 +61,12 @@ class Parser {
 				}
 			}
 		}
+		println("|> Starting...")
 		try {
 			curGroup.eval(null)
 		} catch (ex: NameNotDefinedException){
-			println("!> Undefined name: ${ex.name}")
-			ex.printStackTrace()
+			println("!> Undefined name: `${ex.name}'@blk#${curGroup.count}")
+			exitProcess(-1)
 		}
 		println("-> Done.")
 	}

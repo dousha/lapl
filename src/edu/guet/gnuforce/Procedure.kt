@@ -19,7 +19,7 @@ class Procedure(private val signature: NodeGroup, private val body: NodeGroup) {
 		}
 	}
 
-	fun param_count() = paramCount
+	fun paramCount() = paramCount
 
-	private val paramCount = signature.length() - 1;
+	private val paramCount = signature.length() - 1
 }

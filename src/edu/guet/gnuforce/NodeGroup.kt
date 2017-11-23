@@ -7,6 +7,7 @@ open class NodeGroup(private val father: NodeGroup?){
 		if(father == null){
 			for(node in nodes){
 				node.eval(null)
+				++count
 			}
 			return Double.NaN
 		}
@@ -16,7 +17,7 @@ open class NodeGroup(private val father: NodeGroup?){
 					val type = operatorType(nodes[0].name())
 					if (type.paramCount != -1 && length() - 1 != type.paramCount) {
 						if (type == OperatorType.USER_DEFINED
-								&& length() - 1 != UserDefinedOperatorTable.get(nodes[0].name()).param_count())
+								&& length() - 1 != UserDefinedOperatorTable.get(nodes[0].name()).paramCount())
 						throw RuntimeException()
 					}
 					val name = nodes[0].name()
@@ -28,11 +29,11 @@ open class NodeGroup(private val father: NodeGroup?){
 						OperatorType.COMPLEX -> ComplexOperatorTable.get(name)(this, param)
 						OperatorType.USER_DEFINED -> UserDefinedOperatorTable.get(name).eval(this, param)
 					}
-				} catch (_: NameNotDefinedException) {
+				} catch (ex: NameNotDefinedException) {
 					return try {
 						VariablePool.getGlobal(nodes[0].name())
 					} catch (_: NameNotDefinedException) {
-						param?.get(nodes[0].name()) ?: throw NameNotDefinedException(nodes[0].name())
+						param?.get(nodes[0].name()) ?: throw NameNotDefinedException(ex.name)
 					}
 				}
 			}
@@ -78,4 +79,5 @@ open class NodeGroup(private val father: NodeGroup?){
 	}
 
 	private var nodes: Array<Node> = arrayOf()
+	var count: Int = 1
 }
