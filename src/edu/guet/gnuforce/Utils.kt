@@ -4,6 +4,7 @@ private val numComp = "0123456789"
 
 fun isNumber(str: String): Boolean {
 	val hasSign = str[0] == '-'
+	if(hasSign && str.length == 1) return false
 	var hasDot = false
 	var i = if (hasSign) 1 else 0
 	while(i < str.length){

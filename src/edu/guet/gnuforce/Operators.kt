@@ -40,76 +40,98 @@ object SimpleOperatorTable: OperatorTable<() -> Double>() {
 	)
 }
 
-object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String, Double>?) -> Double>() {
-	override var table: Array<Pair<String, (element: Node, param: HashMap<String, Double>?) -> Double>> = arrayOf(
-			Pair("+1", fun(element, param) = element.eval(param) + 1),
-			Pair("-1", fun(element, param) = element.eval(param) - 1),
-			Pair("ln", fun(element, param) = Math.log(element.eval(param))),
-			Pair("ret", fun(element, param) = element.eval(param)),
+object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String, Data>?) -> Double>() {
+	override var table: Array<Pair<String, (element: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
+			Pair("+1", fun(element, param) = element.eval(param).number() + 1),
+			Pair("-1", fun(element, param) = element.eval(param).number() - 1),
+			Pair("ln", fun(element, param) = Math.log(element.eval(param).number())),
+			Pair("ret", fun(element, param) = element.eval(param).number()),
 			Pair("display", fun(element, param): Double {
-				println(element.eval(param))
+				println(element.eval(param).number())
 				return Double.NaN
 			}),
 			Pair("drop!", fun(element, _): Double {
-				VariablePool.dropGlobal(element.name())
+				VariablePool.drop(element.name())
 				return Double.NaN
 			})
 	)
 }
 
 
-object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashMap<String, Double>?) -> Double>() {
-	override var table: Array<Pair<String, (left: Node, right: Node, param: HashMap<String, Double>?) -> Double>> = arrayOf(
-			Pair("+", fun(left, right, param) = left.eval(param) + right.eval(param)),
-			Pair("-", fun(left, right, param) = left.eval(param) - right.eval(param)),
-			Pair("*", fun(left, right, param) = left.eval(param) * right.eval(param)),
-			Pair("/", fun(left, right, param) = left.eval(param) / right.eval(param)),
-			Pair("^", fun(left, right, param) = Math.pow(left.eval(param), right.eval(param))),
+object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashMap<String, Data>?) -> Double>() {
+	override var table: Array<Pair<String, (left: Node, right: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
+			Pair("+", fun(left, right, param) = left.eval(param).number() + right.eval(param).number()),
+			Pair("-", fun(left, right, param) = left.eval(param).number() - right.eval(param).number()),
+			Pair("*", fun(left, right, param) = left.eval(param).number() * right.eval(param).number()),
+			Pair("/", fun(left, right, param) = left.eval(param).number() / right.eval(param).number()),
+			Pair("^", fun(left, right, param) = Math.pow(left.eval(param).number(), right.eval(param).number())),
 			Pair("set!", fun(name, value, param): Double {
-				VariablePool.setGlobal(name.name(), value.eval(param))
+				VariablePool.set(name.name(), value.eval(param).number())
 				return Double.NaN
 			}),
-			Pair("<", fun(left, right, param) = if (left.eval(param) < right.eval(param)) 1.0 else 0.0),
-			Pair(">", fun(left, right, param) = if (left.eval(param) > right.eval(param)) 1.0 else 0.0),
-			Pair("<=", fun(left, right, param) = if (left.eval(param) <= right.eval(param)) 1.0 else 0.0),
-			Pair(">=", fun(left, right, param) = if (left.eval(param) >= right.eval(param)) 1.0 else 0.0),
-			Pair("!=", fun(left, right, param) = if (left.eval(param) != right.eval(param)) 1.0 else 0.0),
-			Pair("=", fun(left, right, param) = if(left.eval(param) - right.eval(param) < 0.000000001) 1.0 else 0.0),
-			Pair("==", fun(left, right, param) = if (left.eval(param) == right.eval(param)) 1.0 else 0.0),
+			Pair("<", fun(left, right, param) = if (left.eval(param).number() < right.eval(param).number()) 1.0 else 0.0),
+			Pair(">", fun(left, right, param) = if (left.eval(param).number() > right.eval(param).number()) 1.0 else 0.0),
+			Pair("<=", fun(left, right, param) = if (left.eval(param).number() <= right.eval(param).number()) 1.0 else 0.0),
+			Pair(">=", fun(left, right, param) = if (left.eval(param).number() >= right.eval(param).number()) 1.0 else 0.0),
+			Pair("!=", fun(left, right, param) = if (left.eval(param).number() != right.eval(param).number()) 1.0 else 0.0),
+			Pair("=", fun(left, right, param) = if(left.eval(param).number() - right.eval(param).number() < 0.000000001) 1.0 else 0.0),
+			Pair("==", fun(left, right, param) = if (left.eval(param).number() == right.eval(param).number()) 1.0 else 0.0),
 			Pair("def", fun(signature, body, _): Double {
 				UserDefinedOperatorTable.add(signature.pointer().nodes()[0].name(), Procedure(signature.pointer(), body.pointer()))
 				OperatorTypeCache.update(signature.pointer().nodes()[0].name())
 				return Double.NaN
 			}),
 			Pair("while", fun(condition, body, param): Double {
-				while(condition.eval(param) > 0.0){
-					body.eval(param)
+				while(condition.eval(param).number() > 0.0){
+					body.eval(param).number()
 				}
 				return Double.NaN
 			})
 	)
 }
 
-object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Node, param: HashMap<String, Double>?) -> Double>() {
-	override var table: Array<Pair<String, (left: Node, middle: Node, right: Node, param: HashMap<String, Double>?) -> Double>> = arrayOf(
+object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Double>() {
+	override var table: Array<Pair<String, (left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
 			Pair("if", fun(condition, consequence, alternative, param): Double {
-				return if (condition.eval(param) > 0.0)
-					consequence.eval(param)
+				return if (condition.eval(param).number() > 0.0)
+					consequence.eval(param).number()
 				else
-					alternative.eval(param)
+					alternative.eval(param).number()
+			}),
+			Pair("let", fun(name, value, body, param): Double {
+				val pFlag = VariablePool.has(name.name())
+				return if(pFlag) {
+					val protect = VariablePool.get(name.name())
+					VariablePool.set(name.name(), value.eval(param).number())
+					val result = body.eval(param).number()
+					VariablePool.set(name.name(), protect)
+					result
+				} else {
+					VariablePool.set(name.name(), value.eval(param).number())
+					val result = body.eval(param).number()
+					VariablePool.drop(name.name())
+					result
+				}
 			})
 	)
 }
 
-object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Double>?) -> Double>() {
-	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Double>?) -> Double>> = arrayOf(
+object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Data>?) -> Double>() {
+	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Double>> = arrayOf(
 			Pair("len", fun(group, _) = group.length().toDouble()),
 			//Pair("arr", fun(group, param) = group.length().toDouble()),
 			Pair("print", fun(group, _): Double {
 				var start = false
 				for(node: Node in group.nodes()){
-					if(start)
-						print("${node.name()} ")
+					if(start) {
+						if(node.type() == NodeType.NAME)
+							print("${node.name()} ")
+						else {
+							val result = node.eval(null).number()
+							if(!result.isNaN())
+								print("$result ")
+						}
+					}
 					else
 						start = true // skip the first word
 				}

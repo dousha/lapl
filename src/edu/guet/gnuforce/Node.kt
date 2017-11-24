@@ -6,12 +6,12 @@ enum class NodeType {
 
 class Node(private val type: NodeType, private val content: Any){
 
-	fun eval(map: HashMap<String, Double>?): Double{
+	fun eval(map: HashMap<String, Data>?): Data{
 		return when (type) {
-			NodeType.VALUE -> content as Double
-			NodeType.POINTER -> (content as NodeGroup).eval(map)
+			NodeType.VALUE -> Data(DataType.VALUE, content)
+			NodeType.POINTER -> Data(DataType.VALUE, (content as NodeGroup).eval(map))
 			else -> {
-				return map?.get(content as String) ?: VariablePool.getGlobal(content as String)
+				return map?.get(content as String) ?: VariablePool.get(content as String)
 			}
 		}
 	}

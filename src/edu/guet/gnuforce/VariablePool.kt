@@ -3,19 +3,39 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 
 object VariablePool {
-	fun getGlobal(name: String): Double {
+	fun get(name: String): Data {
 		if (pool.containsKey(name))
 			return pool[name]!!
 		else throw NameNotDefinedException(name)
 	}
 
-	fun setGlobal(name: String, value: Double) {
+	fun set(name: String, value: Double) {
+		pool[name] = Data(DataType.VALUE, value)
+	}
+
+	fun set(name: String, value: Node){
+		pool[name] = Data(DataType.POINTER, value)
+	}
+
+	fun set(name: String, value: String){
+		pool[name] = Data(DataType.NAME, value)
+	}
+
+	fun set(name: String, value: LAPLArray){
+		pool[name] = Data(DataType.ARRAY, value)
+	}
+
+	fun set(name: String, value: Data){
 		pool[name] = value
 	}
 
-	fun dropGlobal(name: String){
+	fun drop(name: String){
 		pool.remove(name)
 	}
 
-	private val pool: HashMap<String, Double> = HashMap()
+	fun has(name: String): Boolean {
+		return pool.containsKey(name)
+	}
+
+	private val pool: HashMap<String, Data> = HashMap()
 }

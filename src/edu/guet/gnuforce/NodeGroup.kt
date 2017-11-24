@@ -3,7 +3,7 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 
 open class NodeGroup(private val father: NodeGroup?){
-	fun eval(param: HashMap<String, Double>?): Double {
+	fun eval(param: HashMap<String, Data>?): Double {
 		if(father == null){
 			for(node in nodes){
 				node.eval(null)
@@ -31,15 +31,15 @@ open class NodeGroup(private val father: NodeGroup?){
 					}
 				} catch (ex: NameNotDefinedException) {
 					return try {
-						VariablePool.getGlobal(nodes[0].name())
+						VariablePool.get(nodes[0].name()).number()
 					} catch (_: NameNotDefinedException) {
-						param?.get(nodes[0].name()) ?: throw NameNotDefinedException(ex.name)
+						param?.get(nodes[0].name())?.number() ?: throw NameNotDefinedException(ex.name)
 					}
 				}
 			}
 			NodeType.POINTER -> {
 				return if(length() == 1)
-					nodes[0].eval(param)
+					nodes[0].eval(param).number()
 				else {
 					for (node in nodes) {
 						node.eval(param)
@@ -47,18 +47,14 @@ open class NodeGroup(private val father: NodeGroup?){
 					Double.NaN
 				}
 			}
-			NodeType.VALUE -> return nodes[0].eval(null)
+			NodeType.VALUE -> return nodes[0].eval(param).number()
 			else -> throw RuntimeException()
 		}
 	}
 
-	fun length(): Int {
-		return nodes.size
-	}
+	fun length(): Int = nodes.size
 
-	fun father(): NodeGroup? {
-		return father
-	}
+	fun father(): NodeGroup? = father
 
 	fun add(node: Node){
 		nodes += node

@@ -66,6 +66,10 @@ class Parser {
 			curGroup.eval(null)
 		} catch (ex: NameNotDefinedException){
 			println("!> Undefined name: `${ex.name}'@blk#${curGroup.count}")
+			ex.printStackTrace()
+			exitProcess(-1)
+		} catch (overflow: StackOverflowError){
+			println("!> Stack overflow when evaluating block #${curGroup.count}")
 			exitProcess(-1)
 		}
 		println("-> Done.")

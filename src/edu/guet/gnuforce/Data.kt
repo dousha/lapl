@@ -1,14 +1,16 @@
 package edu.guet.gnuforce
 
 enum class DataType {
-	NULL, VALUE, NAME, POINTER
+	VALUE, NAME, POINTER, ARRAY
 }
 
 data class Data(private val type: DataType, private val content: Any){
-	fun getData(): Any = when (type) {
+	fun number() = when (type) {
 		DataType.VALUE -> content as Double
-		DataType.NAME -> VariablePool.getGlobal(content as String)
-		DataType.POINTER -> (content as Node).eval(null) // TODO: ???
+		DataType.POINTER -> (content as NodeGroup).eval(null)
 		else -> throw RuntimeException()
 	}
+	fun name() = if (type == DataType.NAME) content as String else throw RuntimeException()
+	fun pointer() = if (type == DataType.POINTER) content as NodeGroup else throw RuntimeException()
+	fun array() = if (type == DataType.ARRAY) content as LAPLArray else throw RuntimeException()
 }
