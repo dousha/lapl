@@ -83,18 +83,6 @@ open class NodeGroup(private val father: NodeGroup?){
 
 	fun nodes() = nodes
 
-	override fun toString(): String {
-		val hash = this.hashCode().toString()
-		val builder = StringBuilder()
-		builder.append("NodeGroup@$hash\n")
-		for(node in nodes){
-			builder.append("+------\n")
-			builder.append("\t$node\n")
-		}
-		builder.append("+-----+")
-		return builder.toString()
-	}
-
 	private var nodes: Array<Node> = arrayOf()
 	var count: Int = 1
 }

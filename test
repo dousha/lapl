@@ -36,21 +36,18 @@
 # Expects:
 # 4.0
 
-# Anonymous function
-(def (f @x) (@x))
-(print (f (+ 1 2)))
-(newline)
-(def (g @x) (@x 5))
+# Currying
+(def (g x) (x 5))
 (def (h x) (* 2 x))
 (print (g h))
 (newline)
 # Expects:
-# 3.0
 # 10.0
 
 # Function as formal parameter
-(def (func) (print (+ 1 1)))
-(print (f func))
+(def (f x) (print (x)))
+(def (f') (+ 1 1))
+(print (f f'))
 (newline)
 # Expects:
 # 2.0

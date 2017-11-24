@@ -4,8 +4,8 @@ import edu.guet.gnuforce.exceptions.NameNotDefinedException
 
 object VariablePool {
 	fun get(name: String): Data {
-		if (pool.containsKey(name))
-			return pool[name]!!
+		return if (pool.containsKey(name))
+			pool[name]!!
 		else throw NameNotDefinedException(name)
 	}
 
@@ -33,9 +33,7 @@ object VariablePool {
 		pool.remove(name)
 	}
 
-	fun has(name: String): Boolean {
-		return pool.containsKey(name)
-	}
+	fun has(name: String): Boolean = pool.containsKey(name)
 
 	private val pool: HashMap<String, Data> = HashMap()
 }

@@ -121,14 +121,15 @@ object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<Str
 	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Double>> = arrayOf(
 			Pair("len", fun(group, _) = group.length().toDouble()),
 			//Pair("arr", fun(group, param) = group.length().toDouble()),
-			Pair("print", fun(group, _): Double {
+			Pair("print", fun(group, param): Double {
 				var start = false
 				for(node: Node in group.nodes()){
 					if(start) {
-						if(node.type() == NodeType.NAME)
+						if (node.type() == NodeType.NAME) {
 							print("${node.name()} ")
+						}
 						else {
-							val result = node.eval(null).number()
+							val result = node.eval(param).number()
 							if(!result.isNaN())
 								print("$result ")
 						}

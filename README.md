@@ -16,20 +16,13 @@ To define a new function:
 (def (a-new-function formal-param) (old-function-combinations formal-param))
 ```
 
-... With closures:
-```
-(def (function-with-closures @closure) (@closure parameters))
-```
-(Warning: This language will NOT help you checking if parameter count
-matches with the closure.)
-
 ## Primitives
 
 ### Arithmetic operations
 
 | Operator | Function                 | Type    |
 |:-------- |:------------------------ | -------:|
-| ln       | Natual logarithm         | Monadic |
+| ln       | Natural logarithm        | Monadic |
 | +1       | Increase                 | Monadic |
 | -1       | Decrease                 | Monadic |
 | +        | Add                      | Dyadic  |
@@ -65,13 +58,13 @@ matches with the closure.)
 
 | Operator | Function                 | Type    |
 |:-------- |:------------------------ | -------:|
-| drop!    | Erases a global varaible | Monadic |
+| drop!    | Erases a global variable | Monadic |
 | set!     | Sets a global variable   | Dyadic  |
 | let      | Sets a local variable    | Triadic |
 
-### Array manipuation
+### Array manipulation
 
-_TODO: This part is a stub of an incompleted feature._
+_TODO: This part is a stub of an incomplete feature._
 
 | Operator | Function                                  | Type    |
 |:-------- |:----------------------------------------- | -------:|
@@ -81,7 +74,7 @@ _TODO: This part is a stub of an incompleted feature._
 
 | Operator | Function          | Type    |
 |:-------- |:----------------- | -------:|
-| halt     | Halt immeaditly   | Simple  |
+| halt     | Halt immediately  | Simple  |
 | ret      | Evaluate the node | Monadic |
 | def      | Define a function | Dyadic  |
 

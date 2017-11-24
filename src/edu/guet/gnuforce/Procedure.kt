@@ -10,12 +10,7 @@ class Procedure(private val signature: NodeGroup, private val body: NodeGroup) {
 				sub.put(signature.nodes()[i].name(),
 						when(callerNode.type()){
 							NodeType.VALUE -> Data(DataType.VALUE, callerNode.eval(null).number())
-							NodeType.POINTER -> {
-								if(signature.nodes()[i].name().startsWith("@"))
-									Data(DataType.POINTER, callerNode.pointer())
-								else
-									Data(DataType.VALUE, callerNode.eval(null).name())
-							}
+							NodeType.POINTER -> Data(DataType.VALUE, callerNode.eval(null).name())
 							NodeType.NAME -> Data(DataType.NAME, callerNode.name())
 						})
 				++i
