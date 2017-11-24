@@ -33,7 +33,28 @@ open class NodeGroup(private val father: NodeGroup?){
 					return try {
 						VariablePool.get(nodes[0].name()).number()
 					} catch (_: NameNotDefinedException) {
-						param?.get(nodes[0].name())?.number() ?: throw NameNotDefinedException(ex.name)
+						val data = param?.get(nodes[0].name()) ?: throw NameNotDefinedException(ex.name)
+						when (data.type()) {
+							DataType.VALUE -> data.number()
+							DataType.POINTER -> data.pointer().eval(param)
+							DataType.NAME -> {
+								val name = data.name()
+								try {
+									val type = OperatorTypeCache.get(data.name())
+									when (type) {
+										OperatorType.SIMPLE -> SimpleOperatorTable.get(name)()
+										OperatorType.MONADIC -> MonadicOperatorTable.get(name)(nodes[1], param)
+										OperatorType.DYADIC -> DyadicOperatorTable.get(name)(nodes[1], nodes[2], param)
+										OperatorType.TRIADIC -> TriadicOperatorTable.get(name)(nodes[1], nodes[2], nodes[3], param)
+										OperatorType.COMPLEX -> ComplexOperatorTable.get(name)(this, param)
+										OperatorType.USER_DEFINED -> UserDefinedOperatorTable.get(name).eval(this, param)
+									}
+								} catch (ex: NameNotDefinedException) {
+									return param[ex.name]?.number() ?: VariablePool.get(ex.name).number()
+								}
+							}
+							else -> throw NameNotDefinedException(ex.name)
+						}
 					}
 				}
 			}

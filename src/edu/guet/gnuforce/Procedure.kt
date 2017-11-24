@@ -25,7 +25,7 @@ class Procedure(private val signature: NodeGroup, private val body: NodeGroup) {
 			while (i < signature.length()) {
 				val callerNode = call.nodes()[i]
 				param.put(signature.nodes()[i].name(), when(callerNode.type()){
-					NodeType.VALUE -> Data(DataType.VALUE, callerNode.eval(param))
+					NodeType.VALUE -> callerNode.eval(param)
 					NodeType.POINTER -> {
 						if(signature.nodes()[i].name().startsWith("@"))
 							Data(DataType.POINTER, callerNode.pointer())

@@ -36,15 +36,32 @@
 # Expects:
 # 4.0
 
-# Anonymous function (closure)
+# Anonymous function
 (def (f @x) (@x))
-(print (f (+ 1 1)))
+(print (f (+ 1 2)))
 (newline)
-# Expects
+(def (g @x) (@x 5))
+(def (h x) (* 2 x))
+(print (g h))
+(newline)
+# Expects:
+# 3.0
+# 10.0
+
+# Function as formal parameter
+(def (func) (print (+ 1 1)))
+(print (f func))
+(newline)
+# Expects:
 # 2.0
 
 # Recursion
 (def (factorial x) (if (= x 1) (ret 1) (* x (factorial (- x 1)))))
 (print (factorial 5))
+(newline)
 # Expects:
 # 120.0
+
+# TEST SUCCESS!
+(print test success!)
+(newline)

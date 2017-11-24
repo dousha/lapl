@@ -73,8 +73,9 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 			Pair(">", fun(left, right, param) = if (left.eval(param).number() > right.eval(param).number()) 1.0 else 0.0),
 			Pair("<=", fun(left, right, param) = if (left.eval(param).number() <= right.eval(param).number()) 1.0 else 0.0),
 			Pair(">=", fun(left, right, param) = if (left.eval(param).number() >= right.eval(param).number()) 1.0 else 0.0),
-			Pair("!=", fun(left, right, param) = if (left.eval(param).number() != right.eval(param).number()) 1.0 else 0.0),
-			Pair("=", fun(left, right, param) = if(left.eval(param).number() - right.eval(param).number() < 0.000000001) 1.0 else 0.0),
+			Pair("!=", fun(left, right, param) = if (left.eval(param).number() - right.eval(param).number() > 1e-10) 1.0 else 0.0),
+			Pair("!==", fun(left, right, param) = if (left.eval(param).number() != right.eval(param).number()) 1.0 else 0.0),
+			Pair("=", fun(left, right, param) = if (left.eval(param).number() - right.eval(param).number() < 1e-10) 1.0 else 0.0),
 			Pair("==", fun(left, right, param) = if (left.eval(param).number() == right.eval(param).number()) 1.0 else 0.0),
 			Pair("def", fun(signature, body, _): Double {
 				UserDefinedOperatorTable.add(signature.pointer().nodes()[0].name(), Procedure(signature.pointer(), body.pointer()))
