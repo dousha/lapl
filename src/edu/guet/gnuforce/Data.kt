@@ -1,7 +1,7 @@
 package edu.guet.gnuforce
 
 enum class DataType {
-	VALUE, NAME, POINTER, ARRAY, CHAR
+	VALUE, NAME, POINTER, ARRAY, HANDLER
 }
 
 data class Data(private val type: DataType, private val content: Any){
@@ -14,5 +14,5 @@ data class Data(private val type: DataType, private val content: Any){
 	fun name() = if (type == DataType.NAME) content as String else throw RuntimeException()
 	fun pointer() = if (type == DataType.POINTER) content as NodeGroup else throw RuntimeException()
 	fun array() = if (type == DataType.ARRAY) content as LAPLArray else throw RuntimeException()
-	fun char() = if (type == DataType.CHAR) content as Char else throw RuntimeException()
+	fun handler() = if (type == DataType.HANDLER) content as Handler else throw RuntimeException()
 }

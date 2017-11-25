@@ -2,7 +2,7 @@ package edu.guet.gnuforce
 
 import java.util.*
 
-data class LAPLArray(var shape: Pair<Int, Int>, val content: Array<Data>) {
+data class LAPLArray(var shape: Pair<Int, Int>, var content: Array<Data>) {
 	override fun equals(other: Any?): Boolean {
 		if (this === other) return true
 		if (javaClass != other?.javaClass) return false
@@ -20,4 +20,22 @@ data class LAPLArray(var shape: Pair<Int, Int>, val content: Array<Data>) {
 		result = 31 * result + Arrays.hashCode(content)
 		return result
 	}
+
+	fun append(data: Data) {
+		content += data
+	}
+
+	fun dropAt(index: Int) {
+		content.drop(index)
+	}
+}
+
+fun range(from: Int, to: Int): LAPLArray {
+	val array = LAPLArray(Pair(1, to - from), arrayOf())
+	var i = from
+	while (i <= to) {
+		array.append(Data(DataType.VALUE, i))
+		++i
+	}
+	return array
 }

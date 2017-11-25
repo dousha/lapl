@@ -3,6 +3,7 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 
 object VariablePool {
+
 	fun get(name: String): Data {
 		return if (pool.containsKey(name))
 			pool[name]!!
@@ -13,7 +14,7 @@ object VariablePool {
 		pool[name] = Data(DataType.VALUE, value)
 	}
 
-	fun set(name: String, value: Node){
+	fun set(name: String, value: NodeGroup) {
 		pool[name] = Data(DataType.POINTER, value)
 	}
 

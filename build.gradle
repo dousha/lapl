@@ -21,7 +21,7 @@ buildscript {
 }
 
 sourceSets {
-    main.kotlin.srcDirs += 'src/edu/guet/gnuforce'
+    main.kotlin.srcDirs += 'src/'
 }
 
 jar {

@@ -1,6 +1,12 @@
+/**
+ * Sooner or later you will have to refactor this shit.
+ * esp. when you want to do more
+ */
+
 package edu.guet.gnuforce
 
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
+import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import kotlin.system.exitProcess
 
 enum class OperatorType(val paramCount: Int) {
@@ -87,7 +93,9 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 					body.eval(param).number()
 				}
 				return Double.NaN
-			})
+			}),
+			Pair("read-at", fun(name, index, param)
+					= VariablePool.get(name.name()).array().content[index.eval(param).number().toInt()].number())
 	)
 }
 
@@ -113,6 +121,10 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 					VariablePool.drop(name.name())
 					result
 				}
+			}),
+			Pair("write-at", fun(name, index, value, param): Double {
+				VariablePool.get(name.name()).array().content[index.eval(param).number().toInt()] = Data(DataType.VALUE, value.eval(param).number())
+				return Double.NaN
 			})
 	)
 }
@@ -120,22 +132,28 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Data>?) -> Double>() {
 	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Double>> = arrayOf(
 			Pair("len", fun(group, _) = group.length().toDouble()),
-			//Pair("arr", fun(group, param) = group.length().toDouble()),
+			Pair("arr!", fun(group, param): Double {
+				if (group.length() < 2) throw ParameterMismatchException()
+				val name = group.nodes()[1].name()
+				val arr = LAPLArray(Pair(1, group.length() - 2), arrayOf())
+				for (node in group.nodes().sliceArray(2 until group.length())) {
+					arr.content += Data(DataType.VALUE, node.eval(param).number()) // TODO: May add more data types
+				}
+				VariablePool.set(name, arr)
+				return Double.NaN
+			}),
 			Pair("print", fun(group, param): Double {
 				var start = false
 				for(node: Node in group.nodes()){
 					if(start) {
 						if (node.type() == NodeType.NAME) {
 							print("${node.name()} ")
-						}
-						else {
+						} else {
 							val result = node.eval(param).number()
 							if(!result.isNaN())
 								print("$result ")
 						}
-					}
-					else
-						start = true // skip the first word
+					} else start = true // skip the first word
 				}
 				return Double.NaN
 			})
