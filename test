@@ -66,6 +66,8 @@
 
 # Array
 (arr! arr1 1 2 i 4 5)
+(print (len arr1))
+(newline)
 (print (read-at arr1 2))
 (newline)
 (write-at arr1 2 10)
@@ -74,6 +76,7 @@
 (print (ret i))
 (newline)
 # Expects:
+# 5.0
 # 15.0
 # 10.0
 # 15.0

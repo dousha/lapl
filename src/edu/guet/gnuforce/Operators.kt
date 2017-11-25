@@ -59,7 +59,8 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 			Pair("drop!", fun(element, _): Double {
 				VariablePool.drop(element.name())
 				return Double.NaN
-			})
+			}),
+			Pair("len", fun(name, _) = VariablePool.get(name).array().content.size.toDouble())
 	)
 }
 
@@ -95,7 +96,15 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 				return Double.NaN
 			}),
 			Pair("read-at", fun(name, index, param)
-					= VariablePool.get(name.name()).array().content[index.eval(param).number().toInt()].number())
+					= VariablePool.get(name).array().content[index.eval(param).number().toInt()].number()),
+			Pair("erase-at", fun(name, index, param): Double {
+				VariablePool.get(name).array().content.drop(index.eval(param).number().toInt())
+				return Double.NaN
+			}),
+			Pair("append", fun(name, value, param): Double {
+				VariablePool.get(name).array().content += value.eval(param)
+				return Double.NaN // XXX: Maybe returning the length is better?
+			})
 	)
 }
 
@@ -108,9 +117,9 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 					alternative.eval(param).number()
 			}),
 			Pair("let", fun(name, value, body, param): Double {
-				val pFlag = VariablePool.has(name.name())
+				val pFlag = VariablePool.has(name)
 				return if(pFlag) {
-					val protect = VariablePool.get(name.name())
+					val protect = VariablePool.get(name)
 					VariablePool.set(name.name(), value.eval(param).number())
 					val result = body.eval(param).number()
 					VariablePool.set(name.name(), protect)
@@ -118,12 +127,12 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 				} else {
 					VariablePool.set(name.name(), value.eval(param).number())
 					val result = body.eval(param).number()
-					VariablePool.drop(name.name())
+					VariablePool.drop(name)
 					result
 				}
 			}),
 			Pair("write-at", fun(name, index, value, param): Double {
-				VariablePool.get(name.name()).array().content[index.eval(param).number().toInt()] = Data(DataType.VALUE, value.eval(param).number())
+				VariablePool.get(name).array().content[index.eval(param).number().toInt()] = Data(DataType.VALUE, value.eval(param).number())
 				return Double.NaN
 			})
 	)
@@ -131,7 +140,6 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 
 object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Data>?) -> Double>() {
 	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Double>> = arrayOf(
-			Pair("len", fun(group, _) = group.length().toDouble()),
 			Pair("arr!", fun(group, param): Double {
 				if (group.length() < 2) throw ParameterMismatchException()
 				val name = group.nodes()[1].name()

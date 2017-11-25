@@ -10,6 +10,8 @@ object VariablePool {
 		else throw NameNotDefinedException(name)
 	}
 
+	fun get(node: Node): Data = get(node.name())
+
 	fun set(name: String, value: Double) {
 		pool[name] = Data(DataType.VALUE, value)
 	}
@@ -30,11 +32,13 @@ object VariablePool {
 		pool[name] = value
 	}
 
-	fun drop(name: String){
-		pool.remove(name)
-	}
+	fun drop(name: String) = pool.remove(name)
+
+	fun drop(node: Node) = drop(node.name())
 
 	fun has(name: String): Boolean = pool.containsKey(name)
+
+	fun has(node: Node): Boolean = has(node.name())
 
 	private val pool: HashMap<String, Data> = HashMap()
 }

@@ -1,6 +1,7 @@
 package edu.guet.gnuforce
 
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
+import edu.guet.gnuforce.exceptions.ParameterMismatchException
 
 open class NodeGroup(private val father: NodeGroup?){
 	fun eval(param: HashMap<String, Data>?): Double {
@@ -18,7 +19,7 @@ open class NodeGroup(private val father: NodeGroup?){
 					if (type.paramCount != -1 && length() - 1 != type.paramCount) {
 						if (type == OperatorType.USER_DEFINED
 								&& length() - 1 != UserDefinedOperatorTable.get(nodes[0].name()).paramCount())
-						throw RuntimeException()
+							throw ParameterMismatchException()
 					}
 					val name = nodes[0].name()
 					return when (type) {

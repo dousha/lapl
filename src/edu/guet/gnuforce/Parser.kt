@@ -1,6 +1,7 @@
 package edu.guet.gnuforce
 
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
+import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import java.io.File
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
@@ -70,6 +71,9 @@ class Parser {
 			exitProcess(-1)
 		} catch (overflow: StackOverflowError){
 			println("!> Stack overflow when evaluating block #${curGroup.count}")
+			exitProcess(-1)
+		} catch (mismatch: ParameterMismatchException) {
+			println("!> Parameter count mismatch when evaluating block #${curGroup.count}")
 			exitProcess(-1)
 		}
 		println("-> Done.")

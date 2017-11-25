@@ -69,6 +69,11 @@ _TODO: This part is a stub of an incomplete feature._
 | Operator | Function                                  | Type    |
 |:-------- |:----------------------------------------- | -------:|
 | len      | Get the length of a NodeGroup or an Array | Monadic |
+| read-at  | Get the specific element of an Array      | Dyadic  |
+| append   | Append an element to an Array             | Dyadic  |
+| erase-at | Erases the specific element of an Array   | Dyadic  |
+| write-at | Set the specific element of an Array      | Triadic |
+| arr!     | Creates an Array                          | Complex |
 
 ### Misc
 
