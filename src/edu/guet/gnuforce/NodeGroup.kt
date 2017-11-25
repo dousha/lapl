@@ -37,7 +37,7 @@ open class NodeGroup(private val father: NodeGroup?){
 						val data = param?.get(nodes[0].name()) ?: throw NameNotDefinedException(ex.name)
 						when (data.type()) {
 							DataType.VALUE -> data.number()
-							DataType.POINTER -> data.pointer().eval(param)
+							DataType.POINTER -> data.pointer().eval(param).number()
 							DataType.NAME -> {
 								val name = data.name()
 								try {

@@ -57,6 +57,20 @@
 # Expects:
 # 2.0
 
+# Passing an anonymous function
+(def (for from to step @body)
+	(let i from (
+		(while (< i to) (
+			(@body)
+			(set! i (+ i step)))))))
+(for 0 5 1 ((print (ret i)) (newline)))
+# Expects:
+# 0.0
+# 1.0
+# 2.0
+# 3.0
+# 4.0
+
 # Recursion
 (def (factorial x) (if (= x 1) (ret 1) (* x (factorial (- x 1)))))
 (print (factorial 5))
