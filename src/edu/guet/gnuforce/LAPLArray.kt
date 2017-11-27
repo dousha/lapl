@@ -25,8 +25,13 @@ data class LAPLArray(var shape: Pair<Int, Int>, var content: Array<Data>) {
 		content += data
 	}
 
-	fun dropAt(index: Int) {
-		content.drop(index)
+	fun toString(param: HashMap<String, Data>?): String {
+		val sb = StringBuilder()
+		for (element in content) {
+			sb.append(element.toString(param))
+			sb.append(' ')
+		}
+		return sb.toString()
 	}
 }
 
@@ -36,6 +41,14 @@ fun range(from: Int, to: Int): LAPLArray {
 	while (i <= to) {
 		array.append(Data(DataType.VALUE, i))
 		++i
+	}
+	return array
+}
+
+fun string(str: String): LAPLArray {
+	val array = LAPLArray(Pair(1, str.length), arrayOf())
+	for (char in str.toCharArray()) {
+		array.content += Data(DataType.CHAR, char)
 	}
 	return array
 }

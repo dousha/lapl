@@ -1,5 +1,6 @@
 package edu.guet.gnuforce
 
+import edu.guet.gnuforce.exceptions.DividedByZeroException
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import java.io.File
@@ -75,6 +76,9 @@ class Parser {
 		} catch (mismatch: ParameterMismatchException) {
 			println("!> Parameter count mismatch when evaluating block #${curGroup.count}")
 			exitProcess(-1)
+		} catch (zero: DividedByZeroException) {
+			println("!> Divided by zero when evaluating block #${curGroup.count}")
+			exitProcess(1)
 		}
 		println("-> Done.")
 	}

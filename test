@@ -14,9 +14,9 @@
 # Basic arithmetic operations
 (print (/ (* (+ 1 1) 3) 2))
 (newline)
+#(print (/ 0 0)) # causes error
 # Expects:
 # 3.0
-
 # Global variable definition and referring
 (set! i 15)
 (print (+1 i))
@@ -58,6 +58,7 @@
 # 2.0
 
 # Passing an anonymous function
+# When the function is anonymous, an @ must be prefixed
 (def (for from to step @body)
 	(let i from (
 		(while (< i to) (
@@ -96,6 +97,10 @@
 # 15.0
 # Note: This also shows that when creating an array
 # The value of an variable is passed in.
+
+# `print` function
+(print $arr1)
+(newline)
 
 # TEST SUCCESS!
 (print test success!)

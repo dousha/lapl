@@ -5,6 +5,7 @@
 
 package edu.guet.gnuforce
 
+import edu.guet.gnuforce.exceptions.DividedByZeroException
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import kotlin.system.exitProcess
@@ -60,7 +61,8 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 				VariablePool.drop(element.name())
 				return Double.NaN
 			}),
-			Pair("len", fun(name, _) = VariablePool.get(name).array().content.size.toDouble())
+			Pair("len", fun(name, _) = VariablePool.get(name).array().content.size.toDouble()),
+			Pair("type", fun(name, _) = VariablePool.get(name).type().ordinal.toDouble())
 	)
 }
 
@@ -70,7 +72,7 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 			Pair("+", fun(left, right, param) = left.eval(param).number() + right.eval(param).number()),
 			Pair("-", fun(left, right, param) = left.eval(param).number() - right.eval(param).number()),
 			Pair("*", fun(left, right, param) = left.eval(param).number() * right.eval(param).number()),
-			Pair("/", fun(left, right, param) = left.eval(param).number() / right.eval(param).number()),
+			Pair("/", fun(left, right, param): Double = if (right.eval(param).number() != 0.0) left.eval(param).number() / right.eval(param).number() else throw DividedByZeroException()),
 			Pair("^", fun(left, right, param) = Math.pow(left.eval(param).number(), right.eval(param).number())),
 			Pair("set!", fun(name, value, param): Double {
 				VariablePool.set(name.name(), value.eval(param).number())
@@ -104,6 +106,9 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 			Pair("append", fun(name, value, param): Double {
 				VariablePool.get(name).array().content += value.eval(param)
 				return Double.NaN // XXX: Maybe returning the length is better?
+			}),
+			Pair("file-open", fun(name, path, param): Double {
+				TODO("alas...")
 			})
 	)
 }
@@ -155,7 +160,16 @@ object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<Str
 				for(node: Node in group.nodes()){
 					if(start) {
 						if (node.type() == NodeType.NAME) {
-							print("${node.name()} ")
+							if (node.name().startsWith('$')) {
+								try {
+									val data = VariablePool.get(node.name().substring(1))
+									print("${data.toString(param)} ")
+								} catch (name: NameNotDefinedException) {
+									print("${node.name()} ")
+								}
+							} else {
+								print("${node.name()} ")
+							}
 						} else {
 							val result = node.eval(param).number()
 							if(!result.isNaN())
