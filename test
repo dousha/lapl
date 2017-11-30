@@ -14,9 +14,13 @@
 # Basic arithmetic operations
 (print (/ (* (+ 1 1) 3) 2))
 (newline)
+(print (ln 2.71828))
+(newline)
 #(print (/ 0 0)) # causes error
 # Expects:
 # 3.0
+# 0.999... (some number near 1)
+
 # Global variable definition and referring
 (set! i 15)
 (print (+1 i))
@@ -98,8 +102,16 @@
 # Note: This also shows that when creating an array
 # The value of an variable is passed in.
 
-# `print` function
+# Basic I/O
+(arr! str1 ""I wish you a good day.", he said.")
+# Note: For string literals, there is no need to escape quotes
+# since the first quote indicated that the content should be
+# treated as string literals
 (print $arr1)
+(newline)
+(print $str1)
+(newline)
+(if (< 0 (input! str2)) ((print $str2) (drop! str2)) (print Say something please!))
 (newline)
 
 # TEST SUCCESS!

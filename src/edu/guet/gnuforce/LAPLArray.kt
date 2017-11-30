@@ -27,9 +27,15 @@ data class LAPLArray(var shape: Pair<Int, Int>, var content: Array<Data>) {
 
 	fun toString(param: HashMap<String, Data>?): String {
 		val sb = StringBuilder()
-		for (element in content) {
-			sb.append(element.toString(param))
-			sb.append(' ')
+		if (content[0].type() == DataType.CHAR) {
+			for (element in content) {
+				sb.append(element.char())
+			}
+		} else {
+			for (element in content) {
+				sb.append(element.toString(param))
+				sb.append(' ')
+			}
 		}
 		return sb.toString()
 	}

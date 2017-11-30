@@ -62,7 +62,12 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 				return Double.NaN
 			}),
 			Pair("len", fun(name, _) = VariablePool.get(name).array().content.size.toDouble()),
-			Pair("type", fun(name, _) = VariablePool.get(name).type().ordinal.toDouble())
+			Pair("type", fun(name, _) = VariablePool.get(name).type().ordinal.toDouble()),
+			Pair("input!", fun(name, _): Double {
+				val input = readLine() ?: return 0.0
+				VariablePool.set(name.name(), string(input))
+				return input.length.toDouble()
+			})
 	)
 }
 
@@ -149,10 +154,19 @@ object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<Str
 				if (group.length() < 2) throw ParameterMismatchException()
 				val name = group.nodes()[1].name()
 				val arr = LAPLArray(Pair(1, group.length() - 2), arrayOf())
-				for (node in group.nodes().sliceArray(2 until group.length())) {
-					arr.content += Data(DataType.VALUE, node.eval(param).number()) // TODO: May add more data types
+				if (group.nodes()[2].type() == NodeType.NAME && group.nodes()[2].name().startsWith('"')) {
+					val builder = StringBuilder()
+					for (node in group.nodes().sliceArray(2 until group.length())) {
+						builder.append(node.name())
+						builder.append(' ')
+					}
+					VariablePool.set(name, string(builder.toString().substring(1, builder.length - 2)))
+				} else {
+					for (node in group.nodes().sliceArray(2 until group.length())) {
+						arr.content += Data(DataType.VALUE, node.eval(param).number())
+					}
+					VariablePool.set(name, arr)
 				}
-				VariablePool.set(name, arr)
 				return Double.NaN
 			}),
 			Pair("print", fun(group, param): Double {
