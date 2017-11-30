@@ -1,21 +1,26 @@
 package edu.guet.gnuforce
 
 import edu.guet.gnuforce.exceptions.FunctionNotSupportedException
+import java.io.File
+import java.io.IOException
 
 abstract class Handler {
 	abstract fun read(): Char
-	abstract fun write(): Boolean
+	abstract fun write(content: Data): Boolean
 	abstract fun lock()
 	abstract fun unlock()
+	abstract fun good(): Double
+	override abstract fun toString(): String
 }
 
-class StatusHandler : Handler() { // Mutex
+class StatusHandler : Handler() {
+	// Mutex
 	override fun read(): Char = if (lock) '1' else '0'
 
-	override fun write(): Boolean = throw FunctionNotSupportedException()
+	override fun write(content: Data): Boolean = throw FunctionNotSupportedException()
 
 	override fun lock() {
-		while (lock);
+		while (lock); // waits for lock
 		lock = true
 	}
 
@@ -23,24 +28,42 @@ class StatusHandler : Handler() { // Mutex
 		lock = false
 	}
 
+	override fun good() = 1.0
+
+	override fun toString(): String = "IsLocked: $lock"
+
 	private var lock: Boolean = false
 }
 
 open class FileHandler(path: String) : Handler() {
-	override fun read(): Char {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-	}
+	override fun read(): Char = file.reader().read().toChar()
 
-	override fun write(): Boolean {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+	fun readAll() = file.readText()
+
+	override fun write(content: Data) = write(content, null)
+
+	fun write(content: Data, param: HashMap<String, Data>?): Boolean {
+		if (!file.canWrite()) return false
+		try {
+			file.writer().write(content.toString(param))
+		} catch (io: IOException) {
+			return false
+		}
+		return true
 	}
 
 	override fun lock() {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		lock.lock()
 	}
 
 	override fun unlock() {
-		TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+		lock.unlock()
 	}
 
+	override fun good() = if (file.canRead()) 1.0 else 0.0
+
+	override fun toString(): String = file.readText()
+
+	private val file = File(path)
+	private val lock = StatusHandler()
 }

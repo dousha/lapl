@@ -112,8 +112,15 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 				VariablePool.get(name).array().content += value.eval(param)
 				return Double.NaN // XXX: Maybe returning the length is better?
 			}),
-			Pair("file-open", fun(name, path, param): Double {
-				TODO("alas...")
+			Pair("file-open!", fun(name, path, _): Double {
+				val handler = FileHandler(path.name())
+				VariablePool.set(name.name(), handler)
+				return handler.good()
+			}),
+			Pair("file-read-all!", fun(name, file, _): Double {
+				val str = (VariablePool.get(file).handler() as FileHandler).readAll()
+				VariablePool.set(name.name(), string(str))
+				return str.length.toDouble()
 			})
 	)
 }

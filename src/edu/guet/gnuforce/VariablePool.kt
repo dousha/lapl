@@ -32,6 +32,10 @@ object VariablePool {
 		pool[name] = value
 	}
 
+	fun set(name: String, value: Handler) {
+		pool[name] = Data(DataType.HANDLER, value)
+	}
+
 	fun drop(name: String) = pool.remove(name)
 
 	fun drop(node: Node) = drop(node.name())

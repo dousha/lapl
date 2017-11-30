@@ -114,6 +114,11 @@
 (if (< 0 (input! str2)) ((print $str2) (drop! str2)) (print Say something please!))
 (newline)
 
+# File I/O
+(file-open! file1 test)
+(print $file1)
+(newline)
+
 # TEST SUCCESS!
 (print test success!)
 (newline)
