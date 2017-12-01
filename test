@@ -115,8 +115,16 @@
 (newline)
 
 # File I/O
-(file-open! file1 test)
+(file-open! file1 remote-file)
 (print $file1)
+(newline)
+
+# Evaluating other files and importing functions from there
+# Warning: remote file may overwrite functions and variables
+# This stuff will be fixed in further versions with `namespace`
+# introduced.
+(eval remote-file)
+(remote-hello)
 (newline)
 
 # TEST SUCCESS!

@@ -8,6 +8,7 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.DividedByZeroException
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
+import java.io.File
 import kotlin.system.exitProcess
 
 enum class OperatorType(val paramCount: Int) {
@@ -67,6 +68,11 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 				val input = readLine() ?: return 0.0
 				VariablePool.set(name.name(), string(input))
 				return input.length.toDouble()
+			}),
+			Pair("eval", fun(path, _): Double {
+				val parser = Parser(true)
+				parser.parse(File(path.name()))
+				return Double.NaN
 			})
 	)
 }

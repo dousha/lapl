@@ -7,7 +7,7 @@ import java.io.File
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
-class Parser {
+class Parser(val silent: Boolean = false) {
 	private fun scan(file: File): Boolean {
 		var pCount = 0
 		file.readLines(Charset.forName("UTF-8")).filter { !it.trim().startsWith('#') }.forEach {
@@ -25,10 +25,10 @@ class Parser {
 
 	fun parse(file: File) {
 		if(!scan(file)) {
-			println("!> Syntax error: brackets mismatch!\n")
+			println("!> ${file.name}: Syntax error: brackets mismatch!\n")
 			return
 		}
-		println("|> Parsing...")
+		if (!silent) println("|> Parsing...")
 		file.readLines(Charset.forName("UTF-8")).filter { !it.trim().startsWith('#') }.forEach {
 			var i = 0
 			val line = it.trim()
@@ -63,24 +63,24 @@ class Parser {
 				}
 			}
 		}
-		println("|> Starting...")
+		if (!silent) println("|> Starting...")
 		try {
 			curGroup.eval(null)
 		} catch (ex: NameNotDefinedException){
-			println("!> Undefined name: `${ex.name}'@blk#${curGroup.count}")
+			println("!> Undefined name: `${ex.name}'@${file.name}#${curGroup.count}")
 			ex.printStackTrace()
 			exitProcess(-1)
 		} catch (overflow: StackOverflowError){
-			println("!> Stack overflow when evaluating block #${curGroup.count}")
+			println("!> Stack overflow when evaluating ${file.name}#${curGroup.count}")
 			exitProcess(-1)
 		} catch (mismatch: ParameterMismatchException) {
-			println("!> Parameter count mismatch when evaluating block #${curGroup.count}")
+			println("!> Parameter count mismatch when evaluating ${file.name}#${curGroup.count}")
 			exitProcess(-1)
 		} catch (zero: DividedByZeroException) {
-			println("!> Divided by zero when evaluating block #${curGroup.count}")
+			println("!> Divided by zero when evaluating ${file.name}#${curGroup.count}")
 			exitProcess(1)
 		}
-		println("-> Done.")
+		if (!silent) println("-> Done.")
 	}
 
 	private var depth = 0
