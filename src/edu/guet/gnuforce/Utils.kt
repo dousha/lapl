@@ -28,18 +28,24 @@ fun stringEscape(str: String): String {
 						when (escapeIndicator) {
 							'n' -> '\n'
 							'r' -> '\r'
+							'\\' -> '\\'
+							'_' -> System.lineSeparator()
 							'u' -> {
 								val num = Integer.valueOf(str.substring(i + 1, i + 5), 16)
+								i += 6
 								num.toChar()
 							}
 							'x' -> {
 								val num = Integer.valueOf(str.substring(i + 1, i + 3), 16)
 								num.toChar()
+								i += 4
 							}
 							't' -> '\t'
 							else -> str.substring(i, i + 2)
 						}
 				)
+				i += 2
+				continue
 			}
 		} else {
 			strBuilder.append(str[i])
