@@ -4,10 +4,11 @@ import edu.guet.gnuforce.exceptions.DividedByZeroException
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import java.io.File
+import java.io.FileNotFoundException
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
-class Parser(val silent: Boolean = false) {
+class Parser(private val silent: Boolean = false) {
 	private fun scan(file: File): Boolean {
 		var pCount = 0
 		file.readLines(Charset.forName("UTF-8")).filter { !it.trim().startsWith('#') }.forEach {
@@ -33,6 +34,14 @@ class Parser(val silent: Boolean = false) {
 			var i = 0
 			val line = it.trim()
 			while(i < line.length){
+				if (line[i] == '"') {
+					// into the string literal mode
+					val tail = line.lastIndexOf('"')
+					val literal = line.substring(i, tail + 1)
+					curGroup.add(Node(NodeType.NAME, stringEscape(literal)))
+					i = tail + 1
+					continue
+				}
 				if(line[i] == '#') break
 				if(line[i] == '('){
 					++depth
@@ -49,7 +58,7 @@ class Parser(val silent: Boolean = false) {
 					continue
 				}
 				else{
-					val word = line.removeRange(0 until i).takeWhile { it != ' ' && it != ')'}
+					val word = line.removeRange(0 until i).takeWhile { it != ' ' && it != ')' }
 					if(word.isBlank() || word.isEmpty()){
 						++i
 					} else {
@@ -79,6 +88,9 @@ class Parser(val silent: Boolean = false) {
 		} catch (zero: DividedByZeroException) {
 			println("!> Divided by zero when evaluating ${file.name}#${curGroup.count}")
 			exitProcess(1)
+		} catch (file404: FileNotFoundException) {
+			println("!> Cannot found external file when evaluating ${file.name}#${curGroup.count}")
+			exitProcess(2)
 		}
 		if (!silent) println("-> Done.")
 	}

@@ -3,6 +3,7 @@ package edu.guet.gnuforce
 import edu.guet.gnuforce.exceptions.FunctionNotSupportedException
 import java.io.File
 import java.io.IOException
+import java.io.RandomAccessFile
 
 abstract class Handler {
 	abstract fun read(): Char
@@ -40,17 +41,28 @@ open class FileHandler(path: String) : Handler() {
 
 	fun readAll() = file.readText()
 
+	fun readLine(offset: Int) = fileContents[offset]
+
+	fun countLines() = fileContents.size
+
 	override fun write(content: Data) = write(content, null)
 
 	fun write(content: Data, param: HashMap<String, Data>?): Boolean {
 		if (!file.canWrite()) return false
 		try {
-			file.writer().write(content.toString(param))
+			raf.write(content.toString(param).toByteArray())
+			fileContents = file.readLines() // refresh file contents
 		} catch (io: IOException) {
 			return false
 		}
 		return true
 	}
+
+	fun seek(offset: Long) {
+		raf.seek(offset)
+	}
+
+	fun eof() = raf.length()
 
 	override fun lock() {
 		lock.lock()
@@ -64,6 +76,15 @@ open class FileHandler(path: String) : Handler() {
 
 	override fun toString(): String = file.readText()
 
+	protected fun finalize() {
+		raf.close()
+	}
+
 	private val file = File(path)
+	private val raf = if (file.canRead() && file.canWrite()) RandomAccessFile(file, "rw") else {
+		println("!> Opened a read-only file!")
+		RandomAccessFile(file, "r")
+	}
+	private var fileContents = file.readLines()
 	private val lock = StatusHandler()
 }

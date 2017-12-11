@@ -116,6 +116,9 @@
 
 # File I/O
 (file-open! file1 remote-file)
+(arr! str2 "(def (dynamically-written) (print oh boy that's interesting!))")
+(file-seek file1 (file-eof file1))
+(file-write! file1 str2)
 (print $file1)
 (newline)
 
@@ -125,6 +128,8 @@
 # introduced.
 (eval remote-file)
 (remote-hello)
+(newline)
+(dynamically-written)
 (newline)
 
 # TEST SUCCESS!

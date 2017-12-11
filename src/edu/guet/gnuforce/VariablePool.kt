@@ -40,7 +40,7 @@ object VariablePool {
 
 	fun drop(node: Node) = drop(node.name())
 
-	fun has(name: String): Boolean = pool.containsKey(name)
+	private fun has(name: String): Boolean = pool.containsKey(name)
 
 	fun has(node: Node): Boolean = has(node.name())
 

@@ -79,11 +79,12 @@ _TODO: This part is a stub of an incomplete feature._
 
 ### Variable control
 
-| Operator | Function                 | Type    | Parameters               |
-|:-------- |:------------------------ | -------:| ------------------------ |
-| drop!    | Erases a global variable | Monadic | VarName                  |
-| set!     | Sets a global variable   | Dyadic  | VarName, Any             |
-| let      | Sets a local variable    | Triadic | VarName, Number, BodyPtr |
+| Operator | Function                  | Type    | Parameters               |
+|:-------- |:------------------------- | -------:| ------------------------ |
+| drop!    | Erases a global variable  | Monadic | VarName                  |
+| set?     | Test if a variable is set | Monadic | VarName                  |
+| set!     | Sets a global variable    | Dyadic  | VarName, Any             |
+| let      | Sets a local variable     | Triadic | VarName, Number, BodyPtr |
 
 ### Array manipulation
 
@@ -94,7 +95,7 @@ _TODO: This part is a stub of an incomplete feature._
 | append   | Append an element to an Array             | Dyadic  | VarName, Any|
 | erase-at | Erases the specific element of an Array   | Dyadic  | VarName, Num|
 | write-at | Set the specific element of an Array      | Triadic | Name,Num,Any|
-| arr!     | Creates an Array                          | Complex | Name, Anys  |
+| arr!     | Creates an Array                          | Complex | Name, Any...|
 
 ### Misc
 

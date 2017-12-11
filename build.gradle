@@ -6,17 +6,17 @@ repositories {
 }
 
 dependencies {
-    compile 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.60'
+    compile 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0'
 }
 
 buildscript {
-    ext.kotlin_version = '1.1.60'
+    ext.kotlin_version = '1.2.0'
 
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.1.60'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.2.0'
     }
 }
 
@@ -28,5 +28,6 @@ jar {
     manifest {
         attributes 'Main-Class': 'edu.guet.gnuforce.LAPLMainKt'
     }
+    // make it usable on-the-fly (without fiddling with class path)
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

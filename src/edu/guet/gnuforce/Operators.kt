@@ -73,7 +73,18 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 				val parser = Parser(true)
 				parser.parse(File(path.name()))
 				return Double.NaN
-			})
+			}),
+			Pair("file-lines", fun(file, _) = (VariablePool.get(file).handler() as FileHandler).countLines().toDouble()),
+			Pair("file-lock", fun(file, _): Double {
+				VariablePool.get(file).handler().lock()
+				return Double.NaN
+			}),
+			Pair("file-unlock", fun(file, _): Double {
+				VariablePool.get(file).handler().unlock()
+				return Double.NaN
+			}),
+			Pair("file-eof", fun(file, _): Double = (VariablePool.get(file).handler() as FileHandler).eof().toDouble()),
+			Pair("set?", fun(name, _) = if (VariablePool.has(name)) 1.0 else 0.0)
 	)
 }
 
@@ -127,7 +138,14 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 				val str = (VariablePool.get(file).handler() as FileHandler).readAll()
 				VariablePool.set(name.name(), string(str))
 				return str.length.toDouble()
-			})
+			}),
+			Pair("file-seek", fun(name, pos, param): Double {
+				val offset = pos.eval(param).number().toLong()
+				(VariablePool.get(name).handler() as FileHandler).seek(offset)
+				return offset.toDouble()
+			}),
+			Pair("file-write!", fun(name, arr, param) =
+					if ((VariablePool.get(name).handler() as FileHandler).write(VariablePool.get(arr), param)) 1.0 else 0.0)
 	)
 }
 
@@ -157,6 +175,11 @@ object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Nod
 			Pair("write-at", fun(name, index, value, param): Double {
 				VariablePool.get(name).array().content[index.eval(param).number().toInt()] = Data(DataType.VALUE, value.eval(param).number())
 				return Double.NaN
+			}),
+			Pair("file-read-line!", fun(name, file, offset, param): Double {
+				val str = (VariablePool.get(file).handler() as FileHandler).readLine(offset.eval(param).number().toInt())
+				VariablePool.set(name.name(), string(str))
+				return str.length.toDouble()
 			})
 	)
 }
