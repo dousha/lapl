@@ -37,6 +37,10 @@ class Parser(private val silent: Boolean = false) {
 				if (line[i] == '"') {
 					// into the string literal mode
 					val tail = line.lastIndexOf('"')
+					if (tail == i) {
+						println("!> ${file.name}: Sytax error: broken string literal!\n")
+						return
+					}
 					val literal = line.substring(i, tail + 1)
 					curGroup.add(Node(NodeType.NAME, stringEscape(literal)))
 					i = tail + 1

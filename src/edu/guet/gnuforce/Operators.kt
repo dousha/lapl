@@ -83,6 +83,7 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 				VariablePool.get(file).handler().unlock()
 				return Double.NaN
 			}),
+			Pair("file-delete!", fun(path, _) = if (File(path.name()).deleteRecursively()) 1.0 else 0.0),
 			Pair("file-eof", fun(file, _): Double = (VariablePool.get(file).handler() as FileHandler).eof().toDouble()),
 			Pair("set?", fun(name, _) = if (VariablePool.has(name)) 1.0 else 0.0)
 	)
@@ -133,6 +134,15 @@ object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashM
 				val handler = FileHandler(path.name())
 				VariablePool.set(name.name(), handler)
 				return handler.good()
+			}),
+			Pair("file-new!", fun(name, path, _): Double {
+				val fs = File(path.name())
+				if (fs.createNewFile()) {
+					val handler = FileHandler(path.name())
+					VariablePool.set(name.name(), handler)
+					return handler.good()
+				}
+				return 0.0
 			}),
 			Pair("file-read-all!", fun(name, file, _): Double {
 				val str = (VariablePool.get(file).handler() as FileHandler).readAll()

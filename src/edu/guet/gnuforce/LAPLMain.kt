@@ -16,6 +16,6 @@ fun main(args: Array<String>){
 		}
 		Parser().parse(file)
 	} else {
-		error("Usage: lapl <file>")
+		error("Usage: lapl <file> [args]")
 	}
 }

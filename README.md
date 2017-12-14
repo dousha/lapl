@@ -60,12 +60,14 @@ Every operation would return a Number.
 
 ### I/O
 
-_TODO: This part is a stub of an incomplete feature._
-
 | Operator       | Function                       | Type    | Parameters       |
 |:-------------- |:------------------------------ | -------:| ---------------- |
 | input!         | Read a name from stdin         | Monadic | VarName          |
+| file-delete!   | Delete a file                  | Monadic | FilePath         |
+| file-eof       | Get the end position of a file | Monadic | VarName          |
 | file-open!     | Opens a file                   | Dyadic  | VarName, FilePath|
+| file-new!      | Create a file                  | Dyadic  | VarName, FilePath|
+| file-seek      | Seek in a file (fseek)         | Dyadic  | VarName, Pos     |
 | file-read-all! | Read all the content of a file | Dyadic  | VarName, FileVar |
 | print          | Print some names and values    | Complex | Names or Numbers |
 | display        | (Deprecated) Print a value     | Monadic | Number           |

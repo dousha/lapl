@@ -113,6 +113,10 @@
 (newline)
 (if (< 0 (input! str2)) ((print $str2) (drop! str2)) (print Say something please!))
 (newline)
+# Expects:
+# "I wish you a good day.", he said.
+# (waits for your input)
+# (echo your input, if nothing entered, it complains with `Say something please!`)
 
 # File I/O
 (file-open! file1 remote-file)
@@ -121,6 +125,8 @@
 (file-write! file1 str2)
 (print $file1)
 (newline)
+# Expects:
+# (things that you can see in remote-file)
 
 # Evaluating other files and importing functions from there
 # Warning: remote file may overwrite functions and variables
@@ -131,6 +137,9 @@
 (newline)
 (dynamically-written)
 (newline)
+# Expects:
+# Hello from another file!
+# oh boy that's interesting!
 
 # TEST SUCCESS!
 (print test success!)
