@@ -10,7 +10,7 @@ abstract class Handler {
 	abstract fun write(content: Data): Boolean
 	abstract fun lock()
 	abstract fun unlock()
-	abstract fun good(): Double
+	abstract fun good(): Data
 	override abstract fun toString(): String
 }
 
@@ -29,7 +29,7 @@ class StatusHandler : Handler() {
 		lock = false
 	}
 
-	override fun good() = 1.0
+	override fun good() = TrueData
 
 	override fun toString(): String = "IsLocked: $lock"
 
@@ -72,7 +72,7 @@ open class FileHandler(path: String) : Handler() {
 		lock.unlock()
 	}
 
-	override fun good() = if (file.canRead()) 1.0 else 0.0
+	override fun good() = Data(DataType.BOOL, file.canRead())
 
 	override fun toString(): String = file.readText()
 

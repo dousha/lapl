@@ -16,10 +16,12 @@
 (newline)
 (print (ln 2.71828))
 (newline)
-#(print (/ 0 0)) # causes error
+(print (/ 0 0))
+(newline)
 # Expects:
 # 3.0
 # 0.999... (some number near 1)
+# NaN
 
 # Global variable definition and referring
 (set! i 15)
@@ -30,9 +32,9 @@
 
 # `let` operator shadowing
 (let i 12.5 (
-	(let i 10 ((display i)))
-	(display i)))
-(display i)
+	(let i 10 ((print $i)))
+	(print $i)))
+(print $i)
 # Expects:
 # 10.0
 # 12.5
@@ -84,7 +86,7 @@
 # 120.0
 
 # Array
-(arr! arr1 1 2 i 4 5)
+(set! arr1 (arr 1 2 i 4 5))
 (print (len arr1))
 (newline)
 (print (read-at arr1 2))
@@ -103,7 +105,7 @@
 # The value of an variable is passed in.
 
 # Basic I/O
-(arr! str1 ""I wish you a good day.", he said.")
+(set! str1 (arr ""I wish you a good day.", he said."))
 # Note: For string literals, there is no need to escape quotes
 # since the first quote indicated that the content should be
 # treated as string literals
@@ -119,8 +121,8 @@
 # (echo your input, if nothing entered, it complains with `Say something please!`)
 
 # File I/O
-(file-open! file1 remote-file)
-(arr! str2 "\_(def (dynamically-written) (print oh boy that's interesting!))")
+(set! file1 (file-open remote-file))
+(set! str2 (arr "\_(def (dynamically-written) (print oh boy that's interesting!))"))
 (file-seek file1 (file-eof file1))
 (file-write! file1 str2)
 (print $file1)

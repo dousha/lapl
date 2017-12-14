@@ -1,7 +1,7 @@
 package edu.guet.gnuforce
 
 class Procedure(private val signature: NodeGroup, private val body: NodeGroup) {
-	fun eval(call: NodeGroup, param: HashMap<String, Data>?): Double {
+	fun eval(call: NodeGroup, param: HashMap<String, Data>?): Data {
 		var i = 1
 		return if(param == null) {
 			val sub: HashMap<String, Data> = HashMap()

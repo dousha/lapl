@@ -4,13 +4,13 @@ import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
 
 open class NodeGroup(private val father: NodeGroup?){
-	fun eval(param: HashMap<String, Data>?): Double {
+	fun eval(param: HashMap<String, Data>?): Data {
 		if(father == null){
 			for(node in nodes){
 				node.eval(null)
 				++count
 			}
-			return Double.NaN
+			return NullData
 		}
 		when(nodes[0].type()) {
 			NodeType.NAME -> {
@@ -32,12 +32,12 @@ open class NodeGroup(private val father: NodeGroup?){
 					}
 				} catch (ex: NameNotDefinedException) {
 					return try {
-						VariablePool.get(nodes[0].name()).number()
+						VariablePool.get(nodes[0].name())
 					} catch (_: NameNotDefinedException) {
 						val data = param?.get(nodes[0].name()) ?: throw NameNotDefinedException(ex.name)
 						when (data.type()) {
-							DataType.VALUE -> data.number()
-							DataType.POINTER -> data.pointer().eval(param).number()
+							DataType.VALUE -> data
+							DataType.POINTER -> data.pointer().eval(param)
 							DataType.NAME -> {
 								val name = data.name()
 								try {
@@ -51,7 +51,7 @@ open class NodeGroup(private val father: NodeGroup?){
 										OperatorType.USER_DEFINED -> UserDefinedOperatorTable.get(name).eval(this, param)
 									}
 								} catch (ex: NameNotDefinedException) {
-									return param[ex.name]?.number() ?: VariablePool.get(ex.name).number()
+									return param[ex.name] ?: VariablePool.get(ex.name)
 								}
 							}
 							else -> throw NameNotDefinedException(ex.name)
@@ -61,15 +61,15 @@ open class NodeGroup(private val father: NodeGroup?){
 			}
 			NodeType.POINTER -> {
 				return if(length() == 1)
-					nodes[0].eval(param).number()
+					nodes[0].eval(param)
 				else {
 					for (node in nodes) {
 						node.eval(param)
 					}
-					Double.NaN
+					NullData
 				}
 			}
-			NodeType.VALUE -> return nodes[0].eval(param).number()
+			NodeType.VALUE -> return nodes[0].eval(param)
 			else -> throw RuntimeException()
 		}
 	}

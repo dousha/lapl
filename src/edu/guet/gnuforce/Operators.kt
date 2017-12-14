@@ -35,187 +35,175 @@ abstract class OperatorTable<T> {
 	abstract var table: Array<Pair<String, T>>
 }
 
-object SimpleOperatorTable: OperatorTable<() -> Double>() {
-	override var table: Array<Pair<String, () -> Double>> = arrayOf(
-			Pair("nop", fun() = Double.NaN),
-			Pair("halt", fun(): Double {
+object SimpleOperatorTable: OperatorTable<() -> Data>() {
+	override var table: Array<Pair<String, () -> Data>> = arrayOf(
+			Pair("nop", fun() = NullData),
+			Pair("halt", fun(): Data {
 				exitProcess(0)
 			}),
-			Pair("newline", fun(): Double {
+			Pair("newline", fun(): Data {
 				println()
-				return Double.NaN
+				return NullData
 			})
 	)
 }
 
-object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String, Data>?) -> Double>() {
-	override var table: Array<Pair<String, (element: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
-			Pair("+1", fun(element, param) = element.eval(param).number() + 1),
-			Pair("-1", fun(element, param) = element.eval(param).number() - 1),
-			Pair("ln", fun(element, param) = Math.log(element.eval(param).number())),
-			Pair("ret", fun(element, param) = element.eval(param).number()),
-			Pair("display", fun(element, param): Double {
-				println(element.eval(param).number())
-				return Double.NaN
-			}),
-			Pair("drop!", fun(element, _): Double {
+object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String, Data>?) -> Data>() {
+	override var table: Array<Pair<String, (element: Node, param: HashMap<String, Data>?) -> Data>> = arrayOf(
+			Pair("+1", fun(element, param) = Data(DataType.VALUE, element.eval(param).number() + 1)),
+			Pair("-1", fun(element, param) = Data(DataType.VALUE, element.eval(param).number() - 1)),
+			Pair("ln", fun(element, param) = Data(DataType.VALUE, Math.log(element.eval(param).number()))),
+			Pair("ret", fun(element, param) = element.eval(param)),
+			Pair("drop!", fun(element, _): Data {
 				VariablePool.drop(element.name())
-				return Double.NaN
+				return NullData
 			}),
-			Pair("len", fun(name, _) = VariablePool.get(name).array().content.size.toDouble()),
-			Pair("type", fun(name, _) = VariablePool.get(name).type().ordinal.toDouble()),
-			Pair("input!", fun(name, _): Double {
-				val input = readLine() ?: return 0.0
+			Pair("len", fun(name, _) = Data(DataType.VALUE, VariablePool.get(name).array().content.size.toDouble())),
+			Pair("type", fun(name, _) = Data(DataType.TYPE, VariablePool.get(name).type())),
+			Pair("input!", fun(name, _): Data {
+				val input = readLine() ?: return NullData
 				VariablePool.set(name.name(), string(input))
-				return input.length.toDouble()
+				return Data(DataType.VALUE, input.length.toDouble())
 			}),
-			Pair("eval", fun(path, _): Double {
+			Pair("eval", fun(path, _): Data {
 				val parser = Parser(true)
 				parser.parse(File(path.name()))
-				return Double.NaN
+				return NullData
 			}),
-			Pair("file-lines", fun(file, _) = (VariablePool.get(file).handler() as FileHandler).countLines().toDouble()),
-			Pair("file-lock", fun(file, _): Double {
+			Pair("file-lines", fun(file, _) = Data(DataType.VALUE, (VariablePool.get(file).handler() as FileHandler).countLines().toDouble())),
+			Pair("file-lock", fun(file, _): Data {
 				VariablePool.get(file).handler().lock()
-				return Double.NaN
+				return NullData
 			}),
-			Pair("file-unlock", fun(file, _): Double {
+			Pair("file-unlock", fun(file, _): Data {
 				VariablePool.get(file).handler().unlock()
-				return Double.NaN
+				return NullData
 			}),
-			Pair("file-delete!", fun(path, _) = if (File(path.name()).deleteRecursively()) 1.0 else 0.0),
-			Pair("file-eof", fun(file, _): Double = (VariablePool.get(file).handler() as FileHandler).eof().toDouble()),
-			Pair("set?", fun(name, _) = if (VariablePool.has(name)) 1.0 else 0.0)
+			Pair("file-delete!", fun(path, _) = Data(DataType.BOOL, File(path.name()).deleteRecursively())),
+			Pair("file-eof", fun(file, _) = Data(DataType.VALUE, (VariablePool.get(file).handler() as FileHandler).eof().toDouble())),
+			Pair("set?", fun(name, _) = Data(DataType.BOOL, VariablePool.has(name))),
+			Pair("file-open", fun(path, param) = Data(DataType.HANDLER, FileHandler(path.toString(param)))),
+			Pair("file-new", fun(path, param): Data {
+				val fs = File(path.toString(param))
+				return if (fs.createNewFile())
+					Data(DataType.HANDLER, FileHandler(path.name()))
+				else
+					FalseData
+			})
 	)
 }
 
 
-object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashMap<String, Data>?) -> Double>() {
-	override var table: Array<Pair<String, (left: Node, right: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
-			Pair("+", fun(left, right, param) = left.eval(param).number() + right.eval(param).number()),
-			Pair("-", fun(left, right, param) = left.eval(param).number() - right.eval(param).number()),
-			Pair("*", fun(left, right, param) = left.eval(param).number() * right.eval(param).number()),
-			Pair("/", fun(left, right, param): Double = if (right.eval(param).number() != 0.0) left.eval(param).number() / right.eval(param).number() else throw DividedByZeroException()),
-			Pair("^", fun(left, right, param) = Math.pow(left.eval(param).number(), right.eval(param).number())),
-			Pair("set!", fun(name, value, param): Double {
-				VariablePool.set(name.name(), value.eval(param).number())
-				return Double.NaN
+object DyadicOperatorTable: OperatorTable<(left: Node, right: Node, param: HashMap<String, Data>?) -> Data>() {
+	override var table: Array<Pair<String, (left: Node, right: Node, param: HashMap<String, Data>?) -> Data>> = arrayOf(
+			Pair("+", fun(left, right, param) = Data(DataType.VALUE, left.eval(param).number() + right.eval(param).number())),
+			Pair("-", fun(left, right, param) = Data(DataType.VALUE, left.eval(param).number() - right.eval(param).number())),
+			Pair("*", fun(left, right, param) = Data(DataType.VALUE, left.eval(param).number() * right.eval(param).number())),
+			Pair("/", fun(left, right, param) = Data(DataType.VALUE, left.eval(param).number() / right.eval(param).number())),
+			Pair("^", fun(left, right, param) = Data(DataType.VALUE, Math.pow(left.eval(param).number(), right.eval(param).number()))),
+			Pair("set!", fun(name, value, param): Data {
+				VariablePool.set(name.name(), value.eval(param))
+				return NullData
 			}),
-			Pair("<", fun(left, right, param) = if (left.eval(param).number() < right.eval(param).number()) 1.0 else 0.0),
-			Pair(">", fun(left, right, param) = if (left.eval(param).number() > right.eval(param).number()) 1.0 else 0.0),
-			Pair("<=", fun(left, right, param) = if (left.eval(param).number() <= right.eval(param).number()) 1.0 else 0.0),
-			Pair(">=", fun(left, right, param) = if (left.eval(param).number() >= right.eval(param).number()) 1.0 else 0.0),
-			Pair("!=", fun(left, right, param) = if (left.eval(param).number() - right.eval(param).number() > 1e-10) 1.0 else 0.0),
-			Pair("!==", fun(left, right, param) = if (left.eval(param).number() != right.eval(param).number()) 1.0 else 0.0),
-			Pair("=", fun(left, right, param) = if (left.eval(param).number() - right.eval(param).number() < 1e-10) 1.0 else 0.0),
-			Pair("==", fun(left, right, param) = if (left.eval(param).number() == right.eval(param).number()) 1.0 else 0.0),
-			Pair("def", fun(signature, body, _): Double {
+			Pair("<", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() < right.eval(param).number())),
+			Pair(">", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() > right.eval(param).number())),
+			Pair("<=", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() <= right.eval(param).number())),
+			Pair(">=", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() >= right.eval(param).number())),
+			Pair("!=", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() - right.eval(param).number() > 1e-10)),
+			Pair("!==", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() != right.eval(param).number())),
+			Pair("=", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() - right.eval(param).number() < 1e-10)),
+			Pair("==", fun(left, right, param) = Data(DataType.BOOL, left.eval(param).number() == right.eval(param).number())),
+			Pair("def", fun(signature, body, _): Data {
 				UserDefinedOperatorTable.add(signature.pointer().nodes()[0].name(), Procedure(signature.pointer(), body.pointer()))
 				OperatorTypeCache.update(signature.pointer().nodes()[0].name())
-				return Double.NaN
+				return NullData
 			}),
-			Pair("while", fun(condition, body, param): Double {
-				while(condition.eval(param).number() > 0.0){
-					body.eval(param).number()
+			Pair("while", fun(condition, body, param): Data {
+				while(condition.eval(param).bool()){
+					body.eval(param)
 				}
-				return Double.NaN
+				return NullData
 			}),
 			Pair("read-at", fun(name, index, param)
-					= VariablePool.get(name).array().content[index.eval(param).number().toInt()].number()),
-			Pair("erase-at", fun(name, index, param): Double {
+					= VariablePool.get(name).array().content[index.eval(param).number().toInt()]),
+			Pair("erase-at", fun(name, index, param): Data {
 				VariablePool.get(name).array().content.drop(index.eval(param).number().toInt())
-				return Double.NaN
+				return NullData
 			}),
-			Pair("append", fun(name, value, param): Double {
+			Pair("append", fun(name, value, param): Data {
 				VariablePool.get(name).array().content += value.eval(param)
-				return Double.NaN // XXX: Maybe returning the length is better?
+				return NullData // XXX: Maybe returning the length is better?
 			}),
-			Pair("file-open!", fun(name, path, _): Double {
-				val handler = FileHandler(path.name())
-				VariablePool.set(name.name(), handler)
-				return handler.good()
-			}),
-			Pair("file-new!", fun(name, path, _): Double {
-				val fs = File(path.name())
-				if (fs.createNewFile()) {
-					val handler = FileHandler(path.name())
-					VariablePool.set(name.name(), handler)
-					return handler.good()
-				}
-				return 0.0
-			}),
-			Pair("file-read-all!", fun(name, file, _): Double {
+			Pair("file-read-all!", fun(name, file, _): Data {
 				val str = (VariablePool.get(file).handler() as FileHandler).readAll()
 				VariablePool.set(name.name(), string(str))
-				return str.length.toDouble()
+				return Data(DataType.VALUE, str.length.toDouble())
 			}),
-			Pair("file-seek", fun(name, pos, param): Double {
+			Pair("file-seek", fun(name, pos, param): Data {
 				val offset = pos.eval(param).number().toLong()
 				(VariablePool.get(name).handler() as FileHandler).seek(offset)
-				return offset.toDouble()
+				return Data(DataType.VALUE, offset.toDouble())
 			}),
 			Pair("file-write!", fun(name, arr, param) =
-					if ((VariablePool.get(name).handler() as FileHandler).write(VariablePool.get(arr), param)) 1.0 else 0.0)
+					Data(DataType.BOOL, (VariablePool.get(name).handler() as FileHandler).write(VariablePool.get(arr), param)))
 	)
 }
 
-object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Double>() {
-	override var table: Array<Pair<String, (left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Double>> = arrayOf(
-			Pair("if", fun(condition, consequence, alternative, param): Double {
-				return if (condition.eval(param).number() > 0.0)
-					consequence.eval(param).number()
+object TriadicOperatorTable: OperatorTable<(left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Data>() {
+	override var table: Array<Pair<String, (left: Node, middle: Node, right: Node, param: HashMap<String, Data>?) -> Data>> = arrayOf(
+			Pair("if", fun(condition, consequence, alternative, param): Data {
+				return if (condition.eval(param).bool())
+					consequence.eval(param)
 				else
-					alternative.eval(param).number()
+					alternative.eval(param)
 			}),
-			Pair("let", fun(name, value, body, param): Double {
+			Pair("let", fun(name, value, body, param): Data {
 				val pFlag = VariablePool.has(name)
 				return if(pFlag) {
 					val protect = VariablePool.get(name)
-					VariablePool.set(name.name(), value.eval(param).number())
-					val result = body.eval(param).number()
+					VariablePool.set(name.name(), value.eval(param))
+					val result = body.eval(param)
 					VariablePool.set(name.name(), protect)
 					result
 				} else {
-					VariablePool.set(name.name(), value.eval(param).number())
-					val result = body.eval(param).number()
+					VariablePool.set(name.name(), value.eval(param))
+					val result = body.eval(param)
 					VariablePool.drop(name)
 					result
 				}
 			}),
-			Pair("write-at", fun(name, index, value, param): Double {
-				VariablePool.get(name).array().content[index.eval(param).number().toInt()] = Data(DataType.VALUE, value.eval(param).number())
-				return Double.NaN
+			Pair("write-at", fun(name, index, value, param): Data {
+				VariablePool.get(name).array().content[index.eval(param).number().toInt()] = value.eval(param)
+				return NullData
 			}),
-			Pair("file-read-line!", fun(name, file, offset, param): Double {
+			Pair("file-read-line!", fun(name, file, offset, param): Data {
 				val str = (VariablePool.get(file).handler() as FileHandler).readLine(offset.eval(param).number().toInt())
 				VariablePool.set(name.name(), string(str))
-				return str.length.toDouble()
+				return Data(DataType.VALUE, str.length.toDouble())
 			})
 	)
 }
 
-object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Data>?) -> Double>() {
-	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Double>> = arrayOf(
-			Pair("arr!", fun(group, param): Double {
+object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<String, Data>?) -> Data>() {
+	override var table: Array<Pair<String, (group: NodeGroup, param: HashMap<String, Data>?) -> Data>> = arrayOf(
+			Pair("arr", fun(group, param): Data {
 				if (group.length() < 2) throw ParameterMismatchException()
-				val name = group.nodes()[1].name()
-				val arr = LAPLArray(Pair(1, group.length() - 2), arrayOf())
-				if (group.nodes()[2].type() == NodeType.NAME && group.nodes()[2].name().startsWith('"')) {
+				val arr = LAPLArray(Pair(1, group.length() - 1), arrayOf())
+				if (group.nodes()[1].type() == NodeType.NAME && group.nodes()[1].name().startsWith('"')) {
 					val builder = StringBuilder()
-					for (node in group.nodes().sliceArray(2 until group.length())) {
+					for (node in group.nodes().sliceArray(1 until group.length())) {
 						builder.append(node.name())
 						builder.append(' ')
 					}
-					VariablePool.set(name, string(builder.toString().substring(1, builder.length - 2)))
+					return Data(DataType.ARRAY, string(builder.toString().substring(1, builder.length - 2)))
 				} else {
-					for (node in group.nodes().sliceArray(2 until group.length())) {
-						arr.content += Data(DataType.VALUE, node.eval(param).number())
+					for (node in group.nodes().sliceArray(1 until group.length())) {
+						arr.content += node.eval(param)
 					}
-					VariablePool.set(name, arr)
+					return Data(DataType.ARRAY, arr)
 				}
-				return Double.NaN
 			}),
-			Pair("print", fun(group, param): Double {
+			Pair("print", fun(group, param): Data {
 				var start = false
 				for(node: Node in group.nodes()){
 					if(start) {
@@ -231,13 +219,13 @@ object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<Str
 								print("${node.name()} ")
 							}
 						} else {
-							val result = node.eval(param).number()
-							if(!result.isNaN())
-								print("$result ")
+							val result = node.eval(param)
+							if(result.type() != DataType.NULL)
+								print("${result.number()} ")
 						}
 					} else start = true // skip the first word
 				}
-				return Double.NaN
+				return NullData
 			})
 	)
 }
