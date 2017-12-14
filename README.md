@@ -18,14 +18,17 @@ To define a new function:
 
 ## Data Types
 
-LAPL currently has 6 primitive data types as follows:
+LAPL currently has 9 primitive data types as follows:
 
 * `Number` - Describes a real number like 1, 0, 3.14
 * `Character` - Describes a character like 'A', '文'
 * `Name` - Describe a reference to variables
 * `Pointer` - Describe a reference to procedures
 * `Handler` - Describe a reference to system resources like file handler
-* `Array` - Describe a collection of above types
+* `Array` - Describe a collection of data
+* `Null` - Just null
+* `Type` - Describe a type
+* `Bool` - Describe a Boolean value
 
 Though LAPL does have types, it's controlled by LAPL runtime and cannot be 
 manually assigned. When you creating variables, LAPL would automatically 
@@ -35,78 +38,77 @@ determine the type of certain variable.
 
 ## Primitive Operations
 
-Every operation would return a Number.
+Every operation would return a Data.
 
 ### Arithmetic operations
 
-| Operator | Function                 | Type    | Parameters (if any)      |
-|:-------- |:------------------------ | -------:|:------------------------ |
-| ln       | Natural logarithm        | Monadic | Number                   |
-| +1       | Increase                 | Monadic | Number                   |
-| -1       | Decrease                 | Monadic | Number                   |
-| +        | Add                      | Dyadic  | Number, Number           |
-| -        | Subtract                 | Dyadic  | Number, Number           |
-| *        | Multiply                 | Dyadic  | Number, Number           |
-| /        | Divide                   | Dyadic  | Number, Number except 0. |
-| ^        | Power                    | Dyadic  | Number, Number           |
-| &lt;     | Lesser than              | Dyadic  | Number, Number           |
-| &gt;     | Greater than             | Dyadic  | Number, Number           |
-| =        | Equal                    | Dyadic  | Number, Number           |
-| ==       | Strictly equal[^equ]     | Dyadic  | Number, Number           |
-| !=       | Not equal                | Dyadic  | Number, Number           |
-| !==      | Strictly not equal       | Dyadic  | Number, Number           |
-| &lt;=    | Not greater than         | Dyadic  | Number, Number           |
-| &gt;=    | Not lesser than          | Dyadic  | Number, Number           |
+| Operator | Function                 | Parameters     | Returns |
+|:-------- |:------------------------ |:-------------- |:------- |
+| ln       | Natural logarithm        | Number         | Number  |
+| +1       | Increase                 | Number         | Number  |
+| -1       | Decrease                 | Number         | Number  |
+| +        | Add                      | Number, Number | Number  |
+| -        | Subtract                 | Number, Number | Number  |
+| *        | Multiply                 | Number, Number | Number  |
+| /        | Divide                   | Number, Number | Number  |
+| ^        | Power                    | Number, Number | Number  |
+| &lt;     | Lesser than              | Number, Number | Bool    |
+| &gt;     | Greater than             | Number, Number | Bool    |
+| =        | Equal                    | Number, Number | Bool    |
+| ==       | Strictly equal[^equ]     | Number, Number | Bool    |
+| !=       | Not equal                | Number, Number | Bool    |
+| !==      | Strictly not equal       | Number, Number | Bool    |
+| &lt;=    | Not greater than         | Number, Number | Bool    |
+| &gt;=    | Not lesser than          | Number, Number | Bool    |
 
 ### I/O
 
-| Operator       | Function                       | Type    | Parameters       |
-|:-------------- |:------------------------------ | -------:| ---------------- |
-| input!         | Read a name from stdin         | Monadic | VarName          |
-| file-delete!   | Delete a file                  | Monadic | FilePath         |
-| file-eof       | Get the end position of a file | Monadic | VarName          |
-| file-open!     | Opens a file                   | Dyadic  | VarName, FilePath|
-| file-new!      | Create a file                  | Dyadic  | VarName, FilePath|
-| file-seek      | Seek in a file (fseek)         | Dyadic  | VarName, Pos     |
-| file-read-all! | Read all the content of a file | Dyadic  | VarName, FileVar |
-| print          | Print some names and values    | Complex | Names or Numbers |
-| display        | (Deprecated) Print a value     | Monadic | Number           |
+| Operator       | Function                       | Parameters       | Returns |
+|:-------------- |:------------------------------ |:---------------- |:------- |
+| input!         | Read a name from stdin         | VarName          | Array   |
+| file-delete!   | Delete a file                  | FilePath         | Null    |
+| file-eof       | Get the end position of a file | VarName          | Number  |
+| file-open      | Opens a file                   | FilePath         | Handler |
+| file-new       | Create a file                  | FilePath         | Handler |
+| file-seek      | Seek in a file (fseek)         | VarName, Pos     | Null    |
+| file-read-all! | Read all the content of a file | VarName, FileVar | Null    |
+| print          | Print some names and values    | Names or Numbers | Null    |
 
 ### Flow control
 
-| Operator | Function             | Type    | Parameters               |
-|:-------- |:-------------------- | -------:| ------------------------ |
-| while    | \_(:3\| L)\_[^omit]  | Dyadic  | ConditionPtr, BodyPtr    |
-| if       | \_(:3\| L)\_         | Triadic | CondPtr, ConsPtr, AltPtr |
+| Operator | Function             | Parameters               | Returns    |
+|:-------- |:-------------------- |:------------------------ |:---------- |
+| while    | \_(:3\| L)\_[^omit]  | ConditionPtr, BodyPtr    | (Body)     |
+| if       | \_(:3\| L)\_         | CondPtr, ConsPtr, AltPtr | (Cons/Alt) |
 
 ### Variable control
 
-| Operator | Function                  | Type    | Parameters               |
-|:-------- |:------------------------- | -------:| ------------------------ |
-| drop!    | Erases a global variable  | Monadic | VarName                  |
-| set?     | Test if a variable is set | Monadic | VarName                  |
-| set!     | Sets a global variable    | Dyadic  | VarName, Any             |
-| let      | Sets a local variable     | Triadic | VarName, Number, BodyPtr |
+| Operator | Function                  | Parameters               | Returns |
+|:-------- |:------------------------- |:------------------------ |:------- |
+| drop!    | Erases a global variable  | VarName                  | Null    |
+| set?     | Test if a variable is set | VarName                  | Bool    |
+| set!     | Sets a global variable    | VarName, Any             | Null    |
+| let      | Sets a local variable     | VarName, Number, BodyPtr | Null    |
 
 ### Array manipulation
 
-| Operator | Function                                  | Type    | Parameters  |
-|:-------- |:----------------------------------------- | -------:| ----------- |
-| len      | Get the length of a NodeGroup or an Array | Monadic | VarName     |
-| read-at  | Get the specific element of an Array      | Dyadic  | VarName, Num|
-| append   | Append an element to an Array             | Dyadic  | VarName, Any|
-| erase-at | Erases the specific element of an Array   | Dyadic  | VarName, Num|
-| write-at | Set the specific element of an Array      | Triadic | Name,Num,Any|
-| arr!     | Creates an Array                          | Complex | Name, Any...|
+| Operator | Function                                  | Parameters  | Returns |
+|:-------- |:----------------------------------------- |:----------- |:------- |
+| len      | Get the length of a NodeGroup or an Array | VarName     | Number  |
+| read-at  | Get the specific element of an Array      | VarName, Num| Any     |
+| append   | Append an element to an Array             | VarName, Any| Null    |
+| erase-at | Erases the specific element of an Array   | VarName, Num| Null    |
+| write-at | Set the specific element of an Array      | Name,Num,Any| Null    |
+| arr      | Creates an Array                          | Any...      | Array   |
 
 ### Misc
 
-| Operator | Function          | Type    | Parameters      |
-|:-------- |:----------------- | -------:| --------------- |
-| halt     | Halt immediately  | Simple  | /               |
-| ret      | Evaluate the node | Monadic | Number          |
-| eval     | Evaluate a file   | Monadic | FilePath        |
-| def      | Define a function | Dyadic  | SigPtr, BodyPtr |
+| Operator | Function          | Parameters      | Returns |
+|:-------- |:----------------- |:--------------- |:------- |
+| halt     | Halt immediately  | /               | /       |
+| ret      | Evaluate the node | Node            | Number  |
+| eval     | Evaluate a file   | FilePath        | Null    |
+| def      | Define a function | SigPtr, BodyPtr | Null    |
 
 [^equ]: 'Strictly equal' means two numbers are equal in byte level.
 Sometimes computers add funny because there is rounding error.
