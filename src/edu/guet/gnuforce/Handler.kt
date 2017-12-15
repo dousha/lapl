@@ -6,8 +6,8 @@ import java.io.IOException
 import java.io.RandomAccessFile
 
 abstract class Handler {
-	abstract fun read(): Char
-	abstract fun write(content: Data): Boolean
+	abstract fun read(): Data
+	abstract fun write(content: Data, param: HashMap<String, Data>?): Boolean
 	abstract fun lock()
 	abstract fun unlock()
 	abstract fun good(): Data
@@ -16,9 +16,9 @@ abstract class Handler {
 
 class StatusHandler : Handler() {
 	// Mutex
-	override fun read(): Char = if (lock) '1' else '0'
+	override fun read(): Data = Data(DataType.BOOL, lock)
 
-	override fun write(content: Data): Boolean = throw FunctionNotSupportedException()
+	override fun write(content: Data, param: HashMap<String, Data>?): Boolean = throw FunctionNotSupportedException()
 
 	override fun lock() {
 		while (lock); // waits for lock
@@ -37,7 +37,7 @@ class StatusHandler : Handler() {
 }
 
 open class FileHandler(path: String) : Handler() {
-	override fun read(): Char = file.reader().read().toChar()
+	override fun read(): Data = Data(DataType.CHAR, file.reader().read().toChar())
 
 	fun readAll() = file.readText()
 
@@ -45,9 +45,7 @@ open class FileHandler(path: String) : Handler() {
 
 	fun countLines() = fileContents.size
 
-	override fun write(content: Data) = write(content, null)
-
-	fun write(content: Data, param: HashMap<String, Data>?): Boolean {
+	override fun write(content: Data, param: HashMap<String, Data>?): Boolean {
 		if (!file.canWrite()) return false
 		try {
 			raf.write(content.toString(param).toByteArray())
@@ -87,4 +85,23 @@ open class FileHandler(path: String) : Handler() {
 	}
 	private var fileContents = file.readLines()
 	private val lock = StatusHandler()
+}
+
+class EnvironmentVariableHandler : Handler() {
+	override fun read() = Data(DataType.ARRAY, string(envVarValue))
+
+	override fun write(content: Data, param: HashMap<String, Data>?): Boolean {
+		envVarValue = System.getenv(content.toString(param))
+		return envVarValue.isNotBlank() && envVarValue.isNotEmpty()
+	}
+
+	override fun lock() = throw FunctionNotSupportedException()
+
+	override fun unlock() = throw FunctionNotSupportedException()
+
+	override fun good() = TrueData
+
+	override fun toString() = "SysHandler@${this.hashCode()}"
+
+	private lateinit var envVarValue: String
 }

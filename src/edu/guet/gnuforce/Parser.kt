@@ -38,7 +38,7 @@ class Parser(private val silent: Boolean = false) {
 					// into the string literal mode
 					val tail = line.lastIndexOf('"')
 					if (tail == i) {
-						println("!> ${file.name}: Sytax error: broken string literal!\n")
+						println("!> ${file.name}: Syntax error: broken string literal!\n")
 						return
 					}
 					val literal = line.substring(i, tail + 1)

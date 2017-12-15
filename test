@@ -143,6 +143,10 @@
 # Hello from another file!
 # oh boy that's interesting!
 
+# System related stuff
+(print (env-var (arr "HOME")))
+(newline)
+
 # TEST SUCCESS!
 (print test success!)
 (newline)

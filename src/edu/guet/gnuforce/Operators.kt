@@ -5,7 +5,6 @@
 
 package edu.guet.gnuforce
 
-import edu.guet.gnuforce.exceptions.DividedByZeroException
 import edu.guet.gnuforce.exceptions.NameNotDefinedException
 import edu.guet.gnuforce.exceptions.ParameterMismatchException
 import java.io.File
@@ -89,6 +88,11 @@ object MonadicOperatorTable: OperatorTable<(element: Node, param: HashMap<String
 					Data(DataType.HANDLER, FileHandler(path.name()))
 				else
 					FalseData
+			}),
+			Pair("env-var", fun(name, param): Data {
+				val handler = EnvironmentVariableHandler()
+				handler.write(name.eval(param), param)
+				return handler.read()
 			})
 	)
 }
@@ -221,7 +225,7 @@ object ComplexOperatorTable: OperatorTable<(group: NodeGroup, param: HashMap<Str
 						} else {
 							val result = node.eval(param)
 							if(result.type() != DataType.NULL)
-								print("${result.number()} ")
+								print("${result.toString(param)} ")
 						}
 					} else start = true // skip the first word
 				}
