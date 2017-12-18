@@ -124,7 +124,7 @@
 (set! file1 (file-open remote-file))
 (set! str2 (arr "\_(def (dynamically-written) (print oh boy that's interesting!))"))
 (file-seek file1 (file-eof file1))
-(file-write! file1 str2)
+(file-write file1 str2)
 (print $file1)
 (newline)
 # Expects:

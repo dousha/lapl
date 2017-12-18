@@ -13,7 +13,7 @@ open class NodeGroup(private val father: NodeGroup?){
 			return NullData
 		}
 		when(nodes[0].type()) {
-			NodeType.NAME -> {
+			NodeType.STRING_TOKEN -> {
 				try {
 					val type = operatorType(nodes[0].name())
 					if (type.paramCount != -1 && length() - 1 != type.paramCount) {
@@ -59,7 +59,7 @@ open class NodeGroup(private val father: NodeGroup?){
 					}
 				}
 			}
-			NodeType.POINTER -> {
+			NodeType.NODE_GROUP_POINTER -> {
 				return if(length() == 1)
 					nodes[0].eval(param)
 				else {
@@ -69,7 +69,7 @@ open class NodeGroup(private val father: NodeGroup?){
 					NullData
 				}
 			}
-			NodeType.VALUE -> return nodes[0].eval(param)
+			NodeType.NUMBER_LITERAL -> return nodes[0].eval(param)
 			else -> throw RuntimeException()
 		}
 	}

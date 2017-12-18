@@ -42,7 +42,7 @@ class Parser(private val silent: Boolean = false) {
 						return
 					}
 					val literal = line.substring(i, tail + 1)
-					curGroup.add(Node(NodeType.NAME, stringEscape(literal)))
+					curGroup.add(Node(NodeType.STRING_TOKEN, stringEscape(literal)))
 					i = tail + 1
 					continue
 				}
@@ -51,7 +51,7 @@ class Parser(private val silent: Boolean = false) {
 					++depth
 					++i
 					val newGroup = NodeGroup(curGroup)
-					curGroup.add(Node(NodeType.POINTER, newGroup))
+					curGroup.add(Node(NodeType.NODE_GROUP_POINTER, newGroup))
 					curGroup = newGroup
 					continue
 				}
@@ -67,9 +67,9 @@ class Parser(private val silent: Boolean = false) {
 						++i
 					} else {
 						if(isNumber(word)){
-							curGroup.add(Node(NodeType.VALUE, word.toDouble()))
+							curGroup.add(Node(NodeType.NUMBER_LITERAL, word.toDouble()))
 						} else {
-							curGroup.add(Node(NodeType.NAME, word))
+							curGroup.add(Node(NodeType.STRING_TOKEN, word))
 						}
 						i += word.length
 					}

@@ -23,6 +23,14 @@ data class LAPLArray(var shape: Pair<Int, Int>, var content: Array<Data>) {
 
 	fun append(data: Data) {
 		content += data
+		shape = Pair(shape.first, shape.second + 1)
+	}
+
+	fun join(array: LAPLArray){
+		for(element in array.content){
+			content += element
+		}
+		shape = Pair(shape.first, shape.second + array.shape.second)
 	}
 
 	fun toString(param: HashMap<String, Data>?): String {
@@ -41,12 +49,12 @@ data class LAPLArray(var shape: Pair<Int, Int>, var content: Array<Data>) {
 	}
 }
 
-fun range(from: Int, to: Int): LAPLArray {
+fun range(from: Int, to: Int, step: Int): LAPLArray {
 	val array = LAPLArray(Pair(1, to - from), arrayOf())
 	var i = from
 	while (i <= to) {
 		array.append(Data(DataType.VALUE, i))
-		++i
+		i += step
 	}
 	return array
 }
